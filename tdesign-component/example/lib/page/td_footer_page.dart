@@ -18,6 +18,7 @@ class TDFooterPage extends StatelessWidget {
           ExampleModule(title: '组件类型', children: [
             ExampleItem(desc: '基础页脚', builder: _buildBasic),
             ExampleItem(desc: '基础加链接页脚', builder: _buildBasicWithLink),
+            ExampleItem(builder: _buildBasicWithMultiLink),
             ExampleItem(desc: '品牌页脚', builder: _buildWithLogo),
           ]),
         ]);
@@ -32,32 +33,42 @@ class TDFooterPage extends StatelessWidget {
 
   @Demo(group: 'footer')
   Widget _buildBasicWithLink(BuildContext context) {
-    var link = TdFooterLink(uri: Uri(
-      scheme: 'https',
-      host: 'tdesign.tencent.com',
-      path: 'flutter/components'
-    ), text: '底部链接');
-    return Column(
-      children: [
-        TDFooter(
-          text: 'Copyright @ 2019-2023 TDesign.All Rights Reserved.',
-          links: [link],
-        ),
-        const SizedBox(
-          height: 16,
-        ),
-        TDFooter(
-          text: 'Copyright @ 2019-2023 TDesign.All Rights Reserved.',
-          links: [link, link],
-        ),
-      ],
+    var link = TDFooterLink(
+        uri: Uri(
+            scheme: 'https',
+            host: 'tdesign.tencent.com',
+            path: 'flutter/components'),
+        text: '底部链接');
+    return TDFooter(
+      text: 'Copyright @ 2019-2023 TDesign.All Rights Reserved.',
+      links: [link],
+    );
+  }
+
+  @Demo(group: 'footer')
+  Widget _buildBasicWithMultiLink(BuildContext context) {
+    var link = TDFooterLink(
+        uri: Uri(
+            scheme: 'https',
+            host: 'tdesign.tencent.com',
+            path: 'flutter/components'),
+        text: '底部链接');
+    return TDFooter(
+      text: 'Copyright @ 2019-2023 TDesign.All Rights Reserved.',
+      links: [link, link],
     );
   }
 
   @Demo(group: 'footer')
   Widget _buildWithLogo(BuildContext context) {
-    return const TDFooter(
+    var logo = const TDFooterLogo(
       logoUrl: 'assets/img/td_brand.png',
+      isLocal: true,
+      width: 150,
+      height: 75,
+    );
+    return TDFooter(
+      logo: logo,
     );
   }
 }

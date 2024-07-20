@@ -10,7 +10,7 @@ class TDFooter extends StatelessWidget {
   const TDFooter({
     this.text,
     this.links,
-    this.logoUrl,
+    this.logo,
     Key? key,
   }) : super(key: key);
 
@@ -18,10 +18,10 @@ class TDFooter extends StatelessWidget {
   final String? text;
 
   /// 链接列表
-  final List<TdFooterLink>? links;
+  final List<TDFooterLink>? links;
 
   /// 品牌logo
-  final String? logoUrl;
+  final TDFooterLogo? logo;
 
   @override
   Widget build(BuildContext context) {
@@ -30,58 +30,77 @@ class TDFooter extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          links == null || links!.isEmpty
-              ? Container()
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: buildLinks()),
-          logoUrl == null
-              ? Container()
-              : TDImage(
-                  imgUrl: logoUrl,
-                  width: 200,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-          text == null
-              ? Container()
-              : TDText(text ?? '', textColor: const Color(0x42000000)),
+          _buildLinks(context),
+          _buildLogo(context),
+          _buildText(context),
         ],
       ),
     );
   }
 
-  List<Widget> buildLinks() {
-    assert(links != null);
-    var count = 0;
+  Widget _buildLinks(BuildContext context) {
+    if (links != null && links!.isNotEmpty) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _buildLinkItem(context),
+      );
+    }
+    return Container();
+  }
+
+  List<Widget> _buildLinkItem(BuildContext context) {
+    var firstPlace = true;
     return links!.map((link) {
-      if (count > 0) {
-        ++count;
-        return Row(children: [
-          const TDText(' | ', textColor: Color(0x42000000)),
-          TDLink(
-            label: link.text ?? link.uri.toString(),
-            uri: link.uri,
-            type: TDLinkType.withUnderline,
-            style: TDLinkStyle.primary,
-          )
-        ]);
-      } else {
-        ++count;
-        return (TDLink(
+      if (firstPlace) {
+        firstPlace = false;
+        return TDLink(
           label: link.text ?? link.uri.toString(),
           uri: link.uri,
           type: TDLinkType.withUnderline,
           style: TDLinkStyle.primary,
-        ));
+        );
+      } else {
+        return Row(
+          children: [
+            SizedBox(
+                height: 16,
+                child: VerticalDivider(
+                  color: TDTheme.of(context).grayColor5,
+                )),
+            TDLink(
+              label: link.text ?? link.uri.toString(),
+              uri: link.uri,
+              type: TDLinkType.withUnderline,
+              style: TDLinkStyle.primary,
+            ),
+          ],
+        );
       }
     }).toList();
+  }
+
+  Widget _buildLogo(BuildContext context) {
+    return logo == null
+        ? Container()
+        : TDImage(
+            imgUrl: logo!.isLocal ? null : logo!.logoUrl,
+            assetUrl: logo!.isLocal ? logo!.logoUrl : null,
+            width: logo!.width ?? 150,
+            height: logo!.height ?? 75,
+            fit: BoxFit.contain,
+          );
+  }
+
+  Widget _buildText(BuildContext context) {
+    return text == null
+        ? Container()
+        : TDText(text ?? '', textColor: TDTheme.of(context).fontGyColor3);
   }
 }
 
 /// TDFooter中参数links列表中元素的类型
-class TdFooterLink {
-  const TdFooterLink({
+class TDFooterLink {
+  const TDFooterLink({
     required this.uri,
     this.text,
   });
@@ -92,4 +111,25 @@ class TdFooterLink {
   /// 链接显示的文本
   /// 如果为空，链接将显示为uri
   final String? text;
+}
+
+class TDFooterLogo {
+  const TDFooterLogo({
+    required this.logoUrl,
+    required this.isLocal,
+    this.width,
+    this.height,
+  });
+
+  /// Logo链接
+  final String logoUrl;
+
+  /// 自定义宽
+  final double? width;
+
+  /// 自定义高
+  final double? height;
+
+  /// 是否为本地图片
+  final bool isLocal;
 }
